@@ -48,11 +48,11 @@ namespace LibraryPenaltyCase
                 cezaGunleri.RemoveRange(0, 10);
                 lbGunSayisi.Text = cezaGunleri.Count().ToString();
                 lbCezaMiktari.Text = (cezaGunleri.Count() * cezaMiktari).ToString();
-                // var cezaUcreti = cezaGunleri.Count()* //ülke tablosundan ceza miktarını ve para birimini çekip ekrana yaz
             }
             else
             {
-                //ceza kesilmeyeceği zaman yapılacak işler
+                lbGunSayisi.Text = "0";
+                lbCezaMiktari.Text = "0";
             }
         }
         public List<TatilGunleri> TatilGunleriGetir()
