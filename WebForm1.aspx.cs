@@ -24,6 +24,8 @@ namespace LibraryPenaltyCase
         protected void btCezaHesapla_Click1(object sender, EventArgs e)
         {
             Ulkeler ulke = sql.UlkeGetir(ddlUlkeler.SelectedValue); //Dropdown menu ile seçilen ülkenin bilgilerini veritabanımızdan çekiyoruz
+            if (clAlimTarihi.SelectedDate > clTeslimTarihi.SelectedDate)
+                return;
             Kitap kitap = new Kitap(clAlimTarihi.SelectedDate, clTeslimTarihi.SelectedDate, sql.TatilGunleriGetir(ddlUlkeler.SelectedValue));  //kitap öğesini oluşturup constructoru ile gerekli bilgileri hesaplıyoruz
 
             if (kitap.CezaGunleri.Count > 10)
