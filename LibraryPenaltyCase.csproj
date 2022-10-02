@@ -76,6 +76,8 @@
     <Content Include="WebForm1.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classlar\Kitap.cs" />
+    <Compile Include="Classlar\SQLSorgulari.cs" />
     <Compile Include="Classlar\TatilGunleri.cs" />
     <Compile Include="Classlar\Ulkeler.cs" />
     <Compile Include="Global.asax.cs">

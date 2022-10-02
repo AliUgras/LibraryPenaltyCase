@@ -50,6 +50,8 @@
 
             <asp:Label ID="lbCezaMiktari" runat="server"></asp:Label>
 
+            <asp:Label ID="lbParaBirimi" runat="server"></asp:Label>
+
         </h2>
     </div>
 </asp:Content>

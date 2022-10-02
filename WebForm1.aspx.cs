@@ -13,85 +13,33 @@ namespace LibraryPenaltyCase
     public partial class WebForm1 : System.Web.UI.Page
     {
         #region Değişkenler
-
-        SqlConnection baglanti = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
-        public static float cezaMiktari;
-        public static string paraBirimi;
-
+        SQLSorgulari sql = new SQLSorgulari();
         #endregion
         #region Constructor
         protected void Page_Load(object sender, EventArgs e)
         {
         }
         #endregion
+        #region Fonksiyonlar
         protected void btCezaHesapla_Click1(object sender, EventArgs e)
         {
-            var tatilGunleri = TatilGunleriGetir();
-            var cezaGunleri = new List<DateTime>();
+            Ulkeler ulke = sql.UlkeGetir(ddlUlkeler.SelectedValue); //Dropdown menu ile seçilen ülkenin bilgilerini veritabanımızdan çekiyoruz
+            Kitap kitap = new Kitap(clAlimTarihi.SelectedDate, clTeslimTarihi.SelectedDate, sql.TatilGunleriGetir(ddlUlkeler.SelectedValue));  //kitap öğesini oluşturup constructoru ile gerekli bilgileri hesaplıyoruz
 
-            for (var i = clAlimTarihi.SelectedDate; i <= clTeslimTarihi.SelectedDate; i = i.AddDays(1))  //seçilen başlangıç ve bitiş tarihleri arasını for ile dön -- daha sonra bir kitap classı oluşturulup orada bir fonksiyon olarak konulabilir
+            if (kitap.CezaGunleri.Count > 10)
             {
-                if (i.DayOfWeek == DayOfWeek.Sunday || i.DayOfWeek == DayOfWeek.Saturday)
-                {
-                    //cumartesi ve ya pazar günlerini ceza listesine ekleme
-                }
-                else if (tatilGunleri.Any(x => x.TatilGunu.Day == i.Day && x.TatilGunu.Month == i.Month))
-                {
-                    //Resmi tatilleri ceza listesine ekleme
-                }
-                else
-                    cezaGunleri.Add(i);  //içerisinde kitap alınmasından iade edilmesine kadar tatil olmayan her günü barındıran list buradan ilk 10 günü çıkar kalan günü cezalandır.
+                kitap.CezaGunleri.RemoveRange(0, 10);
+                lbGunSayisi.Text = kitap.CezaGunleri.Count().ToString();
+                lbCezaMiktari.Text = (kitap.CezaGunleri.Count() * ulke.CezaMiktari).ToString();
+                lbParaBirimi.Text = ulke.ParaBirimi;
             }
-
-            if (cezaGunleri.Count > 10)
-            {
-                cezaGunleri.RemoveRange(0, 10);
-                lbGunSayisi.Text = cezaGunleri.Count().ToString();
-                lbCezaMiktari.Text = (cezaGunleri.Count() * cezaMiktari).ToString();
-            }
-            else
+            else    //Kitap classında önceden hesaplanmış olan ceza gün sayısını seçilen ülkenin ceza miktarı ile çarpıyoruz
             {
                 lbGunSayisi.Text = "0";
                 lbCezaMiktari.Text = "0";
+                lbParaBirimi.Text = "";
             }
         }
-        public List<TatilGunleri> TatilGunleriGetir()
-        {
-            List<TatilGunleri> tatilGunleri = new List<TatilGunleri>();
-            baglanti.Open();
-
-            string sorgu = "select * from TatilGunleri where UlkeAdi = '" + ddlUlkeler.SelectedValue + "'"; //Sadece seçilen ülkeye ait tatil günlerini getir
-
-            SqlCommand komut = new SqlCommand(sorgu, baglanti);
-
-            var dataReader = komut.ExecuteReader();
-
-            while (dataReader.Read())
-            {
-                var tatilGunu = new TatilGunleri()
-                {
-                    TatilGunu = (DateTime)dataReader["Tarih"],
-                    UlkeAdi = dataReader["UlkeAdi"].ToString()
-                };
-
-                tatilGunleri.Add(tatilGunu);   //tatil günlerinin tamamını datareader'dan listeye al kullanım kolaylığı için
-            }
-            dataReader.Close();
-
-            sorgu= "Select * from Ulkeler where UlkeAdi ='" + ddlUlkeler.SelectedValue + "'";
-
-            komut = new SqlCommand(sorgu, baglanti);
-
-            dataReader = komut.ExecuteReader();
-
-            while (dataReader.Read())
-            {
-                paraBirimi = dataReader["ParaBirimi"].ToString();
-                cezaMiktari = float.Parse(dataReader["CezaMiktari"].ToString());
-            }
-            dataReader.Close();
-            baglanti.Close();
-            return tatilGunleri;
-        }
+        #endregion
     }
 }
